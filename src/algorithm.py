@@ -13,7 +13,7 @@ def get_neibor_graph(rel_rot_inds,n):
     return matrix
 
 def get_spanning_tree(graph):
-    root_id = np.argmin(np.sum(graph,axis=1))
+    root_id = np.argmax(np.sum(graph,axis=1))
     n = graph.shape[0]
     tree = {}
     queue = [root_id]
@@ -121,39 +121,3 @@ def single_rotation_averaging(rots,steps=100):
         exp_delta = cv2.Rodrigues(delta)[0]
         S = exp_delta@S
     return S
-
-
-if __name__ == '__main__':
-    rel_rots,rel_rot_inds,rots_gt,valid_inds = load_Alamo('./data/Alamo.mat')
-
-    t1 = time.time()
-    rots_pred = multiple_rotation_averaging(rel_rots,rel_rot_inds,rots_gt.shape[0],
-                                            steps=10,max_iterations=2,eps=1e-1)
-    t2 = time.time()
-
-    rots_pred = [rots_pred[ind] for ind in valid_inds]
-    rots_gt = [rots_gt[ind] for ind in valid_inds]
-
-    rots_aligned = align_rotation(rots_pred,rots_gt)
-    errors = get_errors(rots_gt,rots_aligned)
-    n = len(errors)
-    if n%2==0:
-        error = (errors[n//2]+errors[n//2-1])/2/np.pi*180
-    else:
-        error = errors[n//2]/np.pi*180
-    print('Median error is {:.3f} degree'.format(error))
-    print('Time cost is {:.3f} s'.format(t2-t1))
-
-    # N = get_neibor_graph(rel_rot_inds,rots_gt.shape[0])
-    # n = N.shape[0]
-    # t1 = time.time()
-    # root_id,tree = get_spanning_tree(N)
-    # t2 = time.time()
-    # print('Building a tree with {} nodes takes {:.3f} ms'.format(N.shape[0],(t2-t1)*1000))
-    # rots_pred = initialize(root_id,tree,rel_rots)
-    
-    # rots_pred = [rots_pred[ind] for ind in valid_inds]
-    # rots_gt = [rots_gt[ind] for ind in valid_inds]
-    # rots_aligned = align_rotation(rots_pred,rots_gt)
-    # error = get_median_error(rots_gt,rots_aligned)
-    # print(error)
