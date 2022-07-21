@@ -66,6 +66,14 @@ def align_rotation(rots_pred,rots_gt):
     rots_aligned = [rots_pred[i]@rots_diff_SO3 for i in range(n)]
     return rots_aligned
 
+
+# def align_rotation(rots_pred,rots_gt):
+#     n = len(rots_pred)
+#     rots_diff = [rots_pred[i]@rots_gt[i].transpose() for i in range(n)]
+#     rots_diff_SO3 = chordal_L2_mean(rots_diff)
+#     rots_aligned = [rots_diff_SO3@rots_gt[i] for i in range(n)]
+#     return rots_aligned
+
 def multiple_rotation_averaging(rel_rots,rel_rot_inds,n,steps=1,max_iterations=1000,eps=1e-3):
     '''Rotation averaging algorithm proposed in 
         "L1 rotation averaging using the Weiszfeld algorithm"'''
